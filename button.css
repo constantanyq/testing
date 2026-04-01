@@ -1,0 +1,137 @@
+body {
+            background-image: url(imej/wood8.png);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+    }
+h3 {
+	font-family: monospace;
+	font-size: 20px;
+	font-weight: bold;
+	text-align: center;
+	color: black;
+
+	padding: 5px 22px;
+	border-radius: 10px 10px 0 0;
+	margin: 40px auto 0px;
+	background-color: gainsboro;-
+	box-shadow: 15px 15px 6px 0px rgba(96, 96, 96, 0.7);
+}
+form {
+	font-family: verdana;
+	font-weight: bold;
+	font-size: 20px;
+	text-align: center;
+    color: lightblue;
+
+      padding: 20px;
+      border:2px solid floralwhite;
+      border-radius:0px 0px 10px 10px;
+      margin:0px auto;
+      background-color: lightseagreen;
+      box-shadow: 15px 15px 6px 0px rgba(96, 96, 96, 0.7);
+}
+
+form.pendek, h3.pendek {
+      width:250px;
+}
+
+form.sederhana, h3.sederhana {
+      width:300px;
+}
+
+form.markah, h3.markah{
+      width:430px;
+}
+
+/* cantumkan sekali */
+input[type="text"],
+input[type="password"],
+select {
+      width: 200px;
+      padding:5px;
+      margin: 5px;
+}
+
+table {
+      font-family:monospace;
+      font-size: 14px;
+      font-weight: bold;
+      color: black;
+}
+
+ input.markah{
+      width: 70px;
+      padding:3px;
+      margin: 2px;
+      text-align: center;
+}
+
+select.markah{
+      width: 200px;
+      padding:3px;
+      margin: 2px;
+}
+
+td.markah_jumlah{
+      font-weight: bold;
+      text-align: center;
+}
+
+td:nth-child(1) {
+      width: 100px;
+      text-align: center;
+}
+
+td:nth-child(2) {
+      width: 150px;
+      text-align: center;
+}
+
+td:nth-child(3) {
+      width: 150px;
+      text-align: center;
+}
+
+td:nth-child(4) {
+      width: 150px;
+      text-align: center;
+}
+
+td:nth-child(5) {
+      width: 150px;
+      text-align: center;
+}
+
+td:nth-child(6) {
+      width: 150px;
+      text-align: center;
+}
+
+td:nth-child(7) {
+      width: 150px;
+      text-align: center;
+}
+
+td:nth-child(8) {
+      width: 150px;
+      text-align: center;
+}
+
+td:nth-child(9) {
+      width: 150px;
+      text-align: center;
+}
+td:nth-child(10) {
+      width: 150px;
+      text-align: center;
+}
+table.markah{
+      margin-top : 5px;
+      width : 430px;
+
+}
+
+th{
+      padding-bottom : 7px;
+}
