@@ -32,24 +32,41 @@ $pct           = $totalAssigned > 0 ? round(($totalMarked / $totalAssigned) * 10
 </div>
 <?php endif; ?>
 
-<div class="dash-grid" style="grid-template-columns: repeat(2, 1fr);">
-    <a href="marks.php"        class="dash-card dc-blue">
-        <div class="dc-icon">✏️</div>
-        <div class="dc-label">Enter / Edit Marks</div>
-        <?php if ($pending > 0): ?>
-        <div class="dc-count dc-count-red"><?= $pending ?> pending</div>
-        <?php endif; ?>
-    </a>
-    <a href="view_results.php" class="dash-card dc-green">
-        <div class="dc-icon">📊</div>
-        <div class="dc-label">View Results</div>
-        <div class="dc-count"><?= $totalMarked ?> marked</div>
-    </a>
+<div class="dash-list">
+    <div class="card dash-list-item border-blue">
+        <div class="dash-item-left">
+            <div class="dash-item-icon">✏️</div>
+            <div class="dash-item-text">
+                <h3>Enter / Edit Marks</h3>
+                <p>Pending Assessments: 
+                    <strong class="<?= $pending > 0 ? 'text-danger' : '' ?>">
+                        <?= $pending ?>
+                    </strong>
+                </p>
+            </div>
+        </div>
+        <div class="dash-item-action">
+            <a href="marks.php" class="btn btn-primary">Manage Marks ➔</a>
+        </div>
+    </div>
+
+    <div class="card dash-list-item border-green">
+        <div class="dash-item-left">
+            <div class="dash-item-icon">📊</div>
+            <div class="dash-item-text">
+                <h3>View Results</h3>
+                <p>Completed: <strong><?= $totalMarked ?></strong></p>
+            </div>
+        </div>
+        <div class="dash-item-action">
+            <a href="view_results.php" class="btn btn-success">Check Results ➔</a>
+        </div>
+    </div>
 </div>
 
 <div class="progress-card">
     <div class="progress-card-top">
-        <span class="progress-label">Assessment Progress</span>
+        <span class="progress-label">Overall Assessment Progress</span>
         <span class="progress-pct"><?= $pct ?>%</span>
     </div>
     <div class="progress-track">
@@ -59,4 +76,5 @@ $pct           = $totalAssigned > 0 ? round(($totalMarked / $totalAssigned) * 10
 </div>
 
 </div>
+
 <?php include "footer.php"; ?>
