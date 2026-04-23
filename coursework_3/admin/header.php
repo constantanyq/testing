@@ -45,6 +45,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         <a href="dashboard.php"   class="<?= basename($_SERVER['PHP_SELF'])=='dashboard.php'   ? 'active' : '' ?>">
             <span class="nav-icon">🏠</span> Dashboard
         </a>
+        <div class="nav-divider"></div>
+        <span class="nav-section-label">Management</span>
         <a href="students.php"    class="<?= basename($_SERVER['PHP_SELF'])=='students.php'    ? 'active' : '' ?>">
             <span class="nav-icon">👨‍🎓</span> Students
         </a>

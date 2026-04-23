@@ -46,6 +46,8 @@ $assessorRole = ucfirst($_SESSION['role']);
         <a href="dashboard.php"    class="<?= basename($_SERVER['PHP_SELF'])=='dashboard.php'    ? 'active' : '' ?>">
             <span class="nav-icon">🏠</span> Dashboard
         </a>
+        <div class="nav-divider"></div>
+        <span class="nav-section-label">Management</span>
         <a href="marks.php"        class="<?= basename($_SERVER['PHP_SELF'])=='marks.php'        ? 'active' : '' ?>">
             <span class="nav-icon">✏️</span> Enter Marks
         </a>

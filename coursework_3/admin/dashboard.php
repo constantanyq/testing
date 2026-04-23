@@ -24,35 +24,84 @@ $graded           = $totalInternships - $pendingMarks;
 </div>
 <?php endif; ?>
 
-<div class="dash-grid">
-    <a href="students.php"      class="dash-card dc-blue">
-        <div class="dc-icon">👨‍🎓</div>
-        <div class="dc-label">Manage Students</div>
-        <div class="dc-count"><?= $totalStudents ?></div>
-    </a>
-    <a href="internships.php"   class="dash-card dc-green">
-        <div class="dc-icon">🏢</div>
-        <div class="dc-label">Manage Internships</div>
-        <div class="dc-count"><?= $totalInternships ?></div>
-    </a>
-    <a href="users.php"         class="dash-card dc-amber">
-        <div class="dc-icon">👥</div>
-        <div class="dc-label">Manage Users</div>
-        <div class="dc-count"><?= $totalLecturers + $totalSupervisors ?></div>
-    </a>
-    <a href="results.php"       class="dash-card dc-indigo">
-        <div class="dc-icon">📊</div>
-        <div class="dc-label">View Results</div>
-        <div class="dc-count"><?= $graded ?> graded</div>
-    </a>
-    <a href="print_results.php" class="dash-card dc-slate">
-        <div class="dc-icon">🖨️</div>
-        <div class="dc-label">Print Report</div>
-    </a>
-    <a href="import_students.php" class="dash-card dc-slate">
-        <div class="dc-icon">📂</div>
-        <div class="dc-label">Import Students</div>
-    </a>
+<div class="dash-list">
+    <div class="card dash-list-item border-blue">
+        <div class="dash-item-left">
+            <div class="dash-item-icon">👨‍🎓</div>
+            <div class="dash-item-text">
+                <h3>Manage Students</h3>
+                <p>Total Registered: <strong><?= $totalStudents ?></strong></p>
+            </div>
+        </div>
+        <div class="dash-item-action">
+            <a href="students.php" class="btn btn-primary">Manage Students ➔</a>
+        </div>
+    </div>
+
+    <div class="card dash-list-item border-green">
+        <div class="dash-item-left">
+            <div class="dash-item-icon">🏢</div>
+            <div class="dash-item-text">
+                <h3>Manage Internships</h3>
+                <p>Active Internships: <strong><?= $totalInternships ?></strong></p>
+            </div>
+        </div>
+        <div class="dash-item-action">
+            <a href="internships.php" class="btn btn-success">View Internships ➔</a>
+        </div>
+    </div>
+
+    <div class="card dash-list-item border-amber">
+        <div class="dash-item-left">
+            <div class="dash-item-icon">👥</div>
+            <div class="dash-item-text">
+                <h3>Manage Users</h3>
+                <p>Lecturers & Supervisors: <strong><?= $totalLecturers + $totalSupervisors ?></strong></p>
+            </div>
+        </div>
+        <div class="dash-item-action">
+            <a href="users.php" class="btn btn-warning">Manage Users ➔</a>
+        </div>
+    </div>
+
+    <div class="card dash-list-item border-indigo">
+        <div class="dash-item-left">
+            <div class="dash-item-icon">📊</div>
+            <div class="dash-item-text">
+                <h3>View Results</h3>
+                <p>Graded Internships: <strong><?= $graded ?></strong></p>
+            </div>
+        </div>
+        <div class="dash-item-action">
+            <a href="results.php" class="btn btn-primary" style="background: #6366f1;">Check Results ➔</a>
+        </div>
+    </div>
+
+    <div class="card dash-list-item border-teal">
+        <div class="dash-item-left">
+            <div class="dash-item-icon">🖨️</div>
+            <div class="dash-item-text">
+                <h3>Print Report</h3>
+                <p>Generate summary documents</p>
+            </div>
+        </div>
+        <div class="dash-item-action">
+            <a href="print_results.php" class="btn btn-teal">Generate Report ➔</a>
+        </div>
+    </div>
+
+    <div class="card dash-list-item border-purple">
+        <div class="dash-item-left">
+            <div class="dash-item-icon">📂</div>
+            <div class="dash-item-text">
+                <h3>Import Students</h3>
+                <p>Bulk upload via CSV</p>
+            </div>
+        </div>
+        <div class="dash-item-action">
+            <a href="import_students.php" class="btn btn-purple">Import Data ➔</a>
+        </div>
+    </div>
 </div>
 
 </div>
