@@ -1,1 +1,0 @@
-G07,Scratch Cat,code,Menengah,SMK Jalan Ipoh
