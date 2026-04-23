@@ -431,11 +431,12 @@ body {
 /* ===== MAIN CONTENT ===== */
 
 .main-content {
-    margin-left: var(--sidebar-w);
+    margin-left: calc(var(--sidebar-w) + 20px);
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 100vh
+    min-height: 100vh;
+    padding-right: 20px;
 }
 
 .topbar {
@@ -467,7 +468,7 @@ body {
 }
 
 .page-body {
-    padding: 28px;
+    padding: 20px 20px 60px 20px;
     flex: 1;
     animation: pageFade 0.3s ease
 }
@@ -660,7 +661,7 @@ body {
 /* ===== FORMS ===== */
 
 .form-group {
-    margin-bottom: 18px
+    margin-bottom: 32px;
 }
 
 .form-group label {
@@ -704,12 +705,16 @@ body {
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px
+    gap: 45px;
 }
 
 .form-group textarea {
     resize: vertical;
     min-height: 80px
+}
+
+.form-group label {
+    margin-bottom: 10px;
 }
 
 
@@ -856,13 +861,14 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px
+    font-size: 12px;
+    table-layout: auto;
 }
 
 thead th {
     background: var(--primary);
     color: rgba(255, 255, 255, 0.82);
-    padding: 13px 18px;
+    padding: 10px 8px;
     text-align: left;
     font-weight: 600;
     font-size: 11px;
@@ -872,10 +878,11 @@ thead th {
 }
 
 tbody td {
-    padding: 13px 18px;
+    padding: 10px 8px;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
-    color: var(--text-soft)
+    color: var(--text-soft);
+    line-height: 1.3;
 }
 
 tbody tr:last-child td {

@@ -32,7 +32,9 @@ $results = mysqli_query($conn, $sql);
 <div class="page-body">
 
 <!-- Search -->
-<div class="card">
+<div class="card card-form">
+    <div class="card-title">Search Results</div>
+    <div class="card-body">
     <form method="GET" style="display:flex; gap:10px; align-items:flex-end;">
         <div class="form-group mb-0" style="flex:1">
             <label>Search by Student ID or Name</label>
@@ -53,8 +55,10 @@ $results = mysqli_query($conn, $sql);
     <span class="text-muted" style="font-size:12px; align-self:center;">⚪ Pending = marks not entered yet</span>
 </div>
 
+<br>
+<br>
 <!-- Results Table -->
-<div class="card">
+<div class="card card-table">
     <div class="card-title">Results Overview</div>
     <div class="table-wrap">
     <table id="mainTable">

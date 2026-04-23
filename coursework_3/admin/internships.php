@@ -140,10 +140,12 @@ function getCompanyLabel($companies, $id) {
     </form>
 </div>
 
-<!-- Add / Edit Internship -->
-<div class="card">
-    <div class="card-title"><?= $editRow ? 'Edit Internship' : 'Assign Internship' ?></div>
+<br>
 
+<!-- Add / Edit Internship -->
+<div class="card card-form">
+    <div class="card-title"><?= $editRow ? 'Edit Internship' : 'Assign Internship' ?></div>
+    <div class="card-body">
     <form method="POST" id="internshipForm">
         <input type="hidden" name="action" value="<?= $editRow ? 'edit' : 'add' ?>">
         <?php if ($editRow): ?>
@@ -232,10 +234,13 @@ function getCompanyLabel($companies, $id) {
             <?php endif; ?>
         </div>
     </form>
+    </div>
 </div>
 
+<div class="section-gap"><span>Internship Records</span></div>
+
 <!-- Internship List -->
-<div class="card">
+<div class="card card-table">
     <div class="card-title flex-between">
         <span>Internship Records</span>
         <div class="search-bar">
