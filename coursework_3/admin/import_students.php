@@ -9,6 +9,13 @@ $msgType = 'success';
 $preview = [];
 $importDone = false;
 
+// ---- CANCEL ----
+if (isset($_GET['clear'])) {
+    unset($_SESSION['import_preview']);
+    header("Location: import_students.php");
+    exit();
+}
+
 // ---- PREVIEW ----
 if (isset($_POST['action']) && $_POST['action'] === 'preview' && isset($_FILES['csvfile'])) {
     $tmp = $_FILES['csvfile']['tmp_name'];
@@ -72,7 +79,7 @@ if ($previewStaged) $preview = $_SESSION['import_preview'];
     <div>
         <div class="breadcrumb">Admin &rsaquo; Import Students</div>
     </div>
-    <a href="students.php" class="btn btn-outline">← Back to Students</a>
+    <a href="import_hub.php" class="btn btn-outline">← Back to Import</a>
 </div>
 
 <div class="page-body">
@@ -84,7 +91,7 @@ if ($previewStaged) $preview = $_SESSION['import_preview'];
 <!-- ── Upload form ── -->
 <?php if (!$previewStaged): ?>
 <div class="card card-form">
-    <div class="card-title">📂 Upload CSV File</div>
+    <div class="card-title">📂 Upload Student CSV</div>
     <div class="card-body">
         <p style="font-size:13px;color:var(--text-soft);margin-bottom:18px;line-height:1.7">
             Upload a <strong>.csv</strong> file to bulk-add students. Each row should follow this format:<br>
@@ -146,7 +153,7 @@ if ($previewStaged) $preview = $_SESSION['import_preview'];
         <input type="hidden" name="action" value="confirm">
         <button type="submit" class="btn btn-success">✅ Confirm &amp; Import <?= count($preview) ?> Students</button>
     </form>
-    <a href="import_students.php" class="btn btn-outline">✕ Cancel</a>
+    <a href="import_students.php?clear=1" class="btn btn-outline">✕ Cancel</a>
 </div>
 
 <?php endif; ?>

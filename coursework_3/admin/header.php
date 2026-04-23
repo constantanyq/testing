@@ -62,8 +62,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         <a href="print_results.php" class="<?= basename($_SERVER['PHP_SELF'])=='print_results.php' ? 'active' : '' ?>">
             <span class="nav-icon">🖨️</span> Print Report
         </a>
-        <a href="import_students.php" class="<?= basename($_SERVER['PHP_SELF'])=='import_students.php' ? 'active' : '' ?>">
-            <span class="nav-icon">📂</span> Import Students
+        <a href="import_hub.php" class="<?= basename($_SERVER['PHP_SELF'])=='import_hub.php' ? 'active' : '' ?>">
+            <span class="nav-icon">📂</span> Import Data
         </a>
     </nav>
     <div class="sidebar-footer">

@@ -112,14 +112,13 @@ if (isset($_GET['edit_sup'])) {
 
 <div class="topbar">
     <h1>Manage Users</h1>
-    
+    <div style="display:flex; gap:10px;">
+        <button id="btn-lec" class="btn btn-primary btn-sm" onclick="toggleUserView('lec')">👨‍🏫 Manage Lecturers</button>
+        <button id="btn-sup" class="btn btn-outline btn-sm" onclick="toggleUserView('sup')">🏢 Manage Supervisors</button>
+    </div>
 </div>
 
 <div class="page-body">
-    <div class="card" style="margin-bottom: 48px; padding: 18px 25px; display: flex; gap: 15px; background: #f8fafc; border-bottom: 3px solid var(--accent);">
-        <button id="btn-lec" class="btn btn-primary" onclick="toggleUserView('lec')">👨‍🏫 Manage Lecturers</button>
-        <button id="btn-sup" class="btn btn-outline" onclick="toggleUserView('sup')">🏢 Manage Supervisors</button>
-    </div>
 
     <?php if ($msg): ?>
         <div class="alert <?= strpos($msg,'ERROR') === 0 ? 'alert-danger' : 'alert-success' ?>">
