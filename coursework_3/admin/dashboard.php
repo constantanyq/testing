@@ -94,12 +94,12 @@ $graded           = $totalInternships - $pendingMarks;
         <div class="dash-item-left">
             <div class="dash-item-icon">📂</div>
             <div class="dash-item-text">
-                <h3>Import Students</h3>
+                <h3>Import Data</h3>
                 <p>Bulk upload via CSV</p>
             </div>
         </div>
         <div class="dash-item-action">
-            <a href="import_students.php" class="btn btn-purple">Import Data ➔</a>
+            <a href="import_hub.php" class="btn btn-purple">Import Data ➔</a>
         </div>
     </div>
 </div>

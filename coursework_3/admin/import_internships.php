@@ -73,7 +73,7 @@ $previewStaged = !$importDone && !empty($_SESSION['int_preview']);
 ?>
 
 <div class="topbar">
-    <div class="breadcrumb">Admin &rsaquo; Bulk Internship Assignment</div>
+    <div class="breadcrumb">Admin &rsaquo; Import Internships</div>
     <a href="import_hub.php" class="btn btn-outline">← Back to Import</a>
 </div>
 

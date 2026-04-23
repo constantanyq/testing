@@ -58,7 +58,7 @@ include "header.php";
             <div class="dash-item-left">
                 <div class="dash-item-icon">💼</div>
                 <div class="dash-item-text">
-                    <h3>Internship AssignmentImport</h3>
+                    <h3>Internship Assignment Import</h3>
                     <p>Format: <code>student_id, company_id, lecturer_id, supervisor_id, duration</code></p>
                 </div>
             </div>
