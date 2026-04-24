@@ -48,25 +48,26 @@ if (isset($_POST['action']) && $_POST['action'] === 'csv_upload') {
                 $sprog = mysqli_real_escape_string($conn, trim($data['programme']       ?? ''));
 
                 if (!$sid || !$sname || !$spass || !$semail || !$sprog) {
-                    $csvLog[] = ['row' => $rowNum, 'id' => $sid ?: '(empty)', 'status' => 'error',   'msg' => 'Missing required field (id, name, password, email, or programme)'];
+                    $csvLog[] = ['row' => $rowNum, 'id' => $sid ?: '(empty)', 'status' => 'error',   'msg' => 'Missing required field'];
                     $errors++;
                     continue;
                 }
 
-                $chk = mysqli_query($conn, "SELECT student_id FROM student WHERE student_id='$sid'");
-                if (mysqli_num_rows($chk) > 0) {
-                    $csvLog[] = ['row' => $rowNum, 'id' => $sid, 'status' => 'skipped', 'msg' => 'ID already exists'];
-                    $skipped++;
-                    continue;
-                }
-
-                $sql = "INSERT INTO student (student_id,student_name,student_password,student_email,programme)
-                        VALUES ('$sid','$sname','$spass','$semail','$sprog')";
+                // SMART UPDATE: Insert new OR update existing student
+                $sql = "INSERT INTO student (student_id, student_name, student_password, student_email, programme)
+                        VALUES ('$sid','$sname','$spass','$semail','$sprog')
+                        ON DUPLICATE KEY UPDATE 
+                        student_name='$sname', student_password='$spass', student_email='$semail', programme='$sprog'";
+                
                 if (mysqli_query($conn, $sql)) {
-                    $csvLog[] = ['row' => $rowNum, 'id' => $sid, 'status' => 'ok',      'msg' => $sname];
-                    $added++;
+                    // Check if it was a new insert (1) or an update to an existing row (2)
+                    $affected = mysqli_affected_rows($conn);
+                    $statusMsg = ($affected == 1) ? "Added: $sname" : "Updated: $sname";
+                    
+                    $csvLog[] = ['row' => $rowNum, 'id' => $sid, 'status' => 'ok', 'msg' => $statusMsg];
+                    $added++; // We count both additions and updates as successful processing
                 } else {
-                    $csvLog[] = ['row' => $rowNum, 'id' => $sid, 'status' => 'error',   'msg' => mysqli_error($conn)];
+                    $csvLog[] = ['row' => $rowNum, 'id' => $sid, 'status' => 'error', 'msg' => mysqli_error($conn)];
                     $errors++;
                 }
             }
@@ -81,8 +82,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'csv_upload') {
 // DELETE
 if (isset($_GET['delete'])) {
     $del_id = mysqli_real_escape_string($conn, $_GET['delete']);
-    mysqli_query($conn, "DELETE FROM student WHERE student_id = '$del_id'");
-    $msg = "Student deleted successfully.";
+    
+    if (mysqli_query($conn, "DELETE FROM student WHERE student_id = '$del_id'")) {
+        $msg = "Student deleted successfully.";
+    } else {
+        $msg = "ERROR: Cannot delete student. They are assigned to an internship.";
+    }
 }
 
 // ADD

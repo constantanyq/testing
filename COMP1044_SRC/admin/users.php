@@ -312,7 +312,7 @@ if (isset($_GET['edit_sup'])) {
 <!-- Lecturer CSV upload -->
 <div class="card">
     <div class="card-title flex-between">
-        <span>📤 Bulk Upload Lecturers via CSV</span>
+        <span>📤 Bulk Upload via CSV</span>
         <a href="users.php?template=lecturer" class="btn btn-outline btn-sm">⬇️ Download Template</a>
     </div>
     <div class="csv-info-box">
