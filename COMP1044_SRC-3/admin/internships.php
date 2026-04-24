@@ -367,7 +367,7 @@ function getCompanyLabel($companies, $id)
                             <td><?= htmlspecialchars($row['company_name'] ?? '—') ?></td>
                             <td><?= htmlspecialchars($row['lecturer_name'] ?? '—') ?></td>
                             <td><?= htmlspecialchars($row['supervisor_name'] ?? '—') ?></td>
-                            <td><?= $row['duration'] ? $row['duration'] . ' wks' : '—' ?></td>
+                            <td><?= $row['duration'] ? $row['duration'] . ' weeks' : '—' ?></td>
                             <td><?= $row['average_marks'] !== null ? number_format($row['average_marks'], 2) : '<span class="text-muted">Pending</span>' ?>
                             </td>
                             <td>
