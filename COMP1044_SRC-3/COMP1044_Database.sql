@@ -32,7 +32,7 @@ CREATE TABLE `admin` (
   `admin_name` varchar(100) NOT NULL,
   `admin_email` varchar(100) DEFAULT NULL,
   `admin_password` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `admin`
@@ -50,7 +50,7 @@ INSERT INTO `admin` (`admin_id`, `admin_name`, `admin_email`, `admin_password`) 
 CREATE TABLE `company` (
   `company_id` int NOT NULL,
   `company_name` varchar(150) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `company`
@@ -73,7 +73,7 @@ CREATE TABLE `component` (
   `component_id` int NOT NULL,
   `component_name` varchar(200) NOT NULL,
   `component_weightage` decimal(5,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `component`
@@ -105,7 +105,7 @@ CREATE TABLE `internship` (
   `l_marks_id` int DEFAULT NULL,
   `duration` int DEFAULT NULL,
   `average_marks` decimal(6,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `internship`
@@ -129,7 +129,7 @@ CREATE TABLE `lecturer` (
   `lecturer_name` varchar(100) NOT NULL,
   `lecturer_email` varchar(100) DEFAULT NULL,
   `lecturer_password` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `lecturer`
@@ -152,7 +152,7 @@ CREATE TABLE `lecturer_marks` (
   `component_mark` decimal(5,2) NOT NULL DEFAULT '0.00',
   `comments` text,
   `total_marks` decimal(6,2) NOT NULL DEFAULT '0.00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `lecturer_marks`
@@ -196,7 +196,7 @@ CREATE TABLE `student` (
   `student_password` varchar(100) NOT NULL,
   `student_email` varchar(100) DEFAULT NULL,
   `programme` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `student`
@@ -221,7 +221,7 @@ CREATE TABLE `supervisor` (
   `supervisor_email` varchar(100) DEFAULT NULL,
   `supervisor_password` varchar(100) NOT NULL,
   `company_id` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `supervisor`
@@ -244,7 +244,7 @@ CREATE TABLE `supervisor_marks` (
   `component_mark` decimal(5,2) NOT NULL DEFAULT '0.00',
   `comments` text,
   `total_marks` decimal(6,2) NOT NULL DEFAULT '0.00'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `supervisor_marks`
