@@ -21,12 +21,13 @@ include "header.php";
 
 $msg = "";
 
-// DELETE
+// DELETE internship — redirect after GET so stale msg can't bleed into CSV upload
 if (isset($_GET['delete'])) {
     $del_id = (int) $_GET['delete'];
     mysqli_query($conn, "DELETE FROM internship WHERE internship_id = $del_id");
     mysqli_query($conn, "ALTER TABLE internship AUTO_INCREMENT = 1");
-    $msg = "Internship record deleted.";
+    header("Location: internships.php?del_ok=internship");
+    exit();
 }
 
 // ADD
@@ -45,7 +46,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'add') {
         $sql = "INSERT INTO internship (student_id, lecturer_id, supervisor_id, company_id, duration)
                 VALUES ('$student_id','$lecturer_id','$supervisor_id','$company_id','$duration')";
         mysqli_query($conn, $sql);
-        $msg = "Internship record added successfully.";
+        header("Location: internships.php?msg=int_added#internship-form");
+        exit();
     }
 }
 
@@ -61,15 +63,17 @@ if (isset($_POST['action']) && $_POST['action'] == 'edit') {
             company_id='$company_id', duration='$duration'
             WHERE internship_id=$iid";
     mysqli_query($conn, $sql);
-    $msg = "Internship record updated.";
+    header("Location: internships.php?msg=int_updated#internship-form");
+    exit();
 }
 
-// DELETE COMPANY
+// DELETE COMPANY — redirect after GET
 if (isset($_GET['del_company'])) {
     $cid = (int) $_GET['del_company'];
     mysqli_query($conn, "DELETE FROM company WHERE company_id=$cid");
     mysqli_query($conn, "ALTER TABLE company AUTO_INCREMENT = 1");
-    $msg = "Company deleted. Linked supervisors and internships have had their company reference cleared.";
+    header("Location: internships.php?del_ok=company");
+    exit();
 }
 
 // EDIT COMPANY (POST)
@@ -78,7 +82,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit_company') {
     $cname = mysqli_real_escape_string($conn, trim($_POST['company_name']));
     if ($cname) {
         mysqli_query($conn, "UPDATE company SET company_name='$cname' WHERE company_id=$cid");
-        $msg = "Company updated.";
+        header("Location: internships.php?msg=company_updated#company-form");
+        exit();
     }
 }
 
@@ -87,7 +92,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_company') {
     $cname = mysqli_real_escape_string($conn, trim($_POST['company_name']));
     if ($cname) {
         mysqli_query($conn, "INSERT INTO company (company_name) VALUES ('$cname')");
-        $msg = "Company added.";
+        header("Location: internships.php?msg=company_added#company-form");
+        exit();
     }
 }
 
@@ -130,6 +136,21 @@ if (isset($_POST['action']) && $_POST['action'] === 'csv_company') {
     } else {
         $msg = "ERROR: No file uploaded.";
     }
+}
+
+// Handle redirect messages from GET params
+if (isset($_GET['del_ok'])) {
+    if ($_GET['del_ok'] === 'internship') $msg = "Internship record deleted.";
+    if ($_GET['del_ok'] === 'company')    $msg = "Company deleted. Linked supervisors and internships have had their company reference cleared.";
+}
+$internshipMsgMap = [
+    'int_added'      => "Internship record added successfully.",
+    'int_updated'    => "Internship record updated.",
+    'company_added'  => "Company added.",
+    'company_updated'=> "Company updated.",
+];
+if (isset($_GET['msg']) && isset($internshipMsgMap[$_GET['msg']])) {
+    $msg = $internshipMsgMap[$_GET['msg']];
 }
 
 // Data for dropdowns 
@@ -224,7 +245,7 @@ function getCompanyLabel($companies, $id)
     <?php endif; ?>
 
     <!-- Company Management -->
-    <div class="card" data-section="company-form">
+    <div class="card" id="company-form" data-section="company-form">
         <div class="card-title flex-between">
             <span>📤 Bulk Upload via CSV</span>
             <a href="internships.php?template=company" class="btn btn-outline btn-sm">⬇️ Download Template</a>
@@ -351,7 +372,7 @@ function getCompanyLabel($companies, $id)
     </div>
 
     <!-- Add / Edit Internship -->
-    <div class="card">
+    <div class="card" id="internship-form">
         <div class="card-title"><?= $editRow ? 'Edit Internship' : 'Assign Internship' ?></div>
 
         <form method="POST" id="internshipForm">
@@ -671,13 +692,20 @@ function getCompanyLabel($companies, $id)
         }
     });
 
-    // Auto-scroll to company form when editing a company
-    <?php if ($editCompany): ?>
-        document.addEventListener('DOMContentLoaded', function () {
-            var companyCard = document.querySelector('[data-section="company-form"]');
-            if (companyCard) companyCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    <?php endif; ?>
+    // Auto-scroll: handle URL hash (covers edit company, edit internship, and post-save messages)
+    (function() {
+        if (window.location.hash) {
+            const el = document.getElementById(window.location.hash.substring(1));
+            if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+        }
+        <?php if ($editCompany): ?>
+        // Legacy: scroll to company form when ?edit_company= is in URL (no hash yet)
+        else {
+            var companyCard = document.getElementById('company-form');
+            if (companyCard) setTimeout(() => companyCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+        }
+        <?php endif; ?>
+    })();
 </script>
 
 <?php include "footer.php"; ?>

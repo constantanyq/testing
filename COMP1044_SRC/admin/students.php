@@ -109,6 +109,10 @@ if (isset($_GET['delete'])) {
 // Handle redirect messages
 if (isset($_GET['deleted'])) $msg = "Student deleted successfully.";
 if (isset($_GET['err']) && $_GET['err'] === 'fk') $msg = "ERROR: Cannot delete student. They are assigned to an internship.";
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] === 'updated') $msg = "Student updated successfully.";
+    if ($_GET['msg'] === 'added')   $msg = "Student added successfully.";
+}
 
 
 // ADD
@@ -125,7 +129,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'add') {
     } else {
         mysqli_query($conn, "INSERT INTO student (student_id,student_name,student_password,student_email,programme)
                 VALUES ('$sid','$sname','$spass','$semail','$sprog')");
-        $msg = "Student added successfully.";
+        header("Location: students.php?msg=added#student-form");
+        exit();
     }
 }
 
@@ -139,7 +144,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'edit') {
 
     mysqli_query($conn, "UPDATE student SET student_name='$sname',student_password='$spass',
             student_email='$semail',programme='$sprog' WHERE student_id='$sid'");
-    $msg = "Student updated successfully.";
+    header("Location: students.php?msg=updated#student-form");
+    exit();
 }
 
 // Fetch student for editing
@@ -233,18 +239,6 @@ if ($sRow = mysqli_fetch_assoc($sRes)) {
         </div>
     </div>
 
-    <!-- CSV Preview Table (shown after file is selected, before upload) -->
-    <div id="csvPreviewSection" style="display:none; margin-top:16px;">
-        <div class="card-title" style="font-size:0.9rem;">👁️ CSV Preview — Please verify before uploading</div>
-        <div class="table-wrap" style="max-height:260px; overflow-y:auto;">
-            <table id="csvPreviewTable">
-                <thead id="csvPreviewHead"></thead>
-                <tbody id="csvPreviewBody"></tbody>
-            </table>
-        </div>
-        <p id="csvPreviewNote" style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;"></p>
-    </div>
-
     <form method="POST" enctype="multipart/form-data" style="margin-top:16px;">
         <input type="hidden" name="action" value="csv_upload">
         <div class="csv-upload-area" id="csvDropZone">
@@ -260,7 +254,7 @@ if ($sRow = mysqli_fetch_assoc($sRes)) {
 </div>
 
 <!-- MANUAL ADD / EDIT FORM -->
-<div class="card">
+<div class="card" id="student-form">
     <div class="card-title"><?= $editStudent ? '✏️ Edit Student' : '➕ Add Single Student' ?></div>
     <form method="POST" action="">
         <input type="hidden" name="action" value="<?= $editStudent ? 'edit' : 'add' ?>">
@@ -356,104 +350,13 @@ if ($sRow = mysqli_fetch_assoc($sRes)) {
 </div><!-- page-body -->
 
 <script>
-// ── CSV PREVIEW ──────────────────────────────────────────────────────────────
-const requiredCols = ['student_id','student_name','student_password','student_email','programme'];
-
-function clearCsvPreview() {
-    document.getElementById('csvFile').value = '';
-    document.getElementById('csvFileName').textContent = 'Accepted format: .csv only';
-    document.getElementById('csvPreviewSection').style.display = 'none';
-    document.getElementById('clearCsvBtn').style.display = 'none';
-    document.getElementById('uploadBtn').disabled = false;
-}
-
-function parseAndPreviewCSV(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const text = e.target.result.replace(/^\uFEFF/, ''); // strip BOM
-        const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
-        if (lines.length < 1) return;
-
-        // Parse CSV rows (handles quoted fields)
-        function parseCSVLine(line) {
-            const result = [];
-            let cur = '', inQ = false;
-            for (let i = 0; i < line.length; i++) {
-                const ch = line[i];
-                if (ch === '"') { inQ = !inQ; }
-                else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
-                else { cur += ch; }
-            }
-            result.push(cur.trim());
-            return result;
-        }
-
-        const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().replace(/"/g,'').trim());
-        const missing = requiredCols.filter(c => !headers.includes(c));
-
-        const previewHead = document.getElementById('csvPreviewHead');
-        const previewBody = document.getElementById('csvPreviewBody');
-        const previewNote = document.getElementById('csvPreviewNote');
-
-        // Build header row, highlight wrong/missing columns
-        let headHtml = '<tr>';
-        headers.forEach(h => {
-            const ok = requiredCols.includes(h);
-            headHtml += `<th style="${ok ? '' : 'color:var(--danger);'}">${h}${ok ? '' : ' ⚠️'}</th>`;
-        });
-        headHtml += '</tr>';
-        previewHead.innerHTML = headHtml;
-
-        // Build data rows (max 10 preview)
-        const dataRows = lines.slice(1, 11);
-        let bodyHtml = '';
-        dataRows.forEach((line, i) => {
-            const cols = parseCSVLine(line);
-            bodyHtml += '<tr>';
-            cols.forEach(c => { bodyHtml += `<td>${c.replace(/</g,'&lt;')}</td>`; });
-            bodyHtml += '</tr>';
-        });
-        previewBody.innerHTML = bodyHtml;
-
-        // Status note
-        const totalData = lines.length - 1;
-        if (missing.length > 0) {
-            previewNote.innerHTML = `<span style="color:var(--danger);">⚠️ Missing required columns: <strong>${missing.join(', ')}</strong>. Please fix your CSV before uploading.</span>`;
-            document.getElementById('uploadBtn').disabled = true;
-        } else {
-            previewNote.innerHTML = `✅ Columns look correct. Showing ${Math.min(10, totalData)} of ${totalData} row(s).`;
-            document.getElementById('uploadBtn').disabled = false;
-        }
-
-        document.getElementById('csvPreviewSection').style.display = 'block';
-        document.getElementById('clearCsvBtn').style.display = 'inline-block';
-    };
-    reader.readAsText(file);
-}
-
-document.getElementById('csvFile').addEventListener('change', function() {
-    if (this.files.length > 0) {
-        document.getElementById('csvFileName').textContent = this.files[0].name;
-        parseAndPreviewCSV(this.files[0]);
+// Auto-scroll to edit form if anchor is present in URL
+(function() {
+    if (window.location.hash) {
+        const el = document.getElementById(window.location.hash.substring(1));
+        if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     }
-});
-
-// Drag & drop
-const dropZone = document.getElementById('csvDropZone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; });
-dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
-dropZone.addEventListener('drop', e => {
-    e.preventDefault();
-    dropZone.style.borderColor = '';
-    const f = e.dataTransfer.files[0];
-    if (f && f.name.endsWith('.csv')) {
-        const dt = new DataTransfer();
-        dt.items.add(f);
-        document.getElementById('csvFile').files = dt.files;
-        document.getElementById('csvFileName').textContent = f.name;
-        parseAndPreviewCSV(f);
-    }
-});
+})();
 </script>
 
 <?php include "footer.php"; ?>

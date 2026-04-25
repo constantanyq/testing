@@ -70,15 +70,19 @@ if (isset($_POST['action']) && $_POST['action'] === 'csv_lec') {
                 }
 
                 $chk = mysqli_query($conn, "SELECT lecturer_id FROM lecturer WHERE lecturer_id='$lid'");
-                if (mysqli_num_rows($chk) > 0) {
-                    $csvLog[] = ['row' => $rowNum, 'id' => $lid, 'status' => 'skipped', 'msg' => 'ID already exists'];
-                    $skipped++; continue;
-                }
+                $lecExists = mysqli_num_rows($chk) > 0;
 
                 if (mysqli_query($conn, "INSERT INTO lecturer (lecturer_id, lecturer_name, lecturer_email, lecturer_password)
-                                         VALUES ('$lid', '$lname', '$lemail', '$lpass')")) {
-                    $csvLog[] = ['row' => $rowNum, 'id' => $lid, 'status' => 'ok', 'msg' => $lname];
-                    $added++;
+                                         VALUES ('$lid', '$lname', '$lemail', '$lpass')
+                                         ON DUPLICATE KEY UPDATE
+                                         lecturer_name='$lname', lecturer_email='$lemail', lecturer_password='$lpass'")) {
+                    if (!$lecExists) {
+                        $csvLog[] = ['row' => $rowNum, 'id' => $lid, 'status' => 'ok', 'msg' => "Added: $lname"];
+                        $added++;
+                    } else {
+                        $csvLog[] = ['row' => $rowNum, 'id' => $lid, 'status' => 'updated', 'msg' => "Updated: $lname"];
+                        $skipped++; // count as skipped for summary
+                    }
                 } else {
                     $csvLog[] = ['row' => $rowNum, 'id' => $lid, 'status' => 'error', 'msg' => mysqli_error($conn)];
                     $errors++;
@@ -140,14 +144,17 @@ if (isset($_POST['action']) && $_POST['action'] === 'csv_sup') {
                 }
 
                 $chk = mysqli_query($conn, "SELECT supervisor_id FROM supervisor WHERE supervisor_id='$sid'");
-                if (mysqli_num_rows($chk) > 0) {
-                    $csvLog[] = ['row' => $rowNum, 'id' => $sid, 'status' => 'skipped', 'msg' => 'ID already exists'];
-                    $skipped++; continue;
-                }
+                $supExists = mysqli_num_rows($chk) > 0;
 
                 if (mysqli_query($conn, "INSERT INTO supervisor (supervisor_id, supervisor_name, supervisor_email, supervisor_password, company_id)
-                                         VALUES ('$sid', '$sname', '$semail', '$spass', $cid_val)")) {
-                    $csvLog[] = ['row' => $rowNum, 'id' => $sid, 'status' => 'ok', 'msg' => $sname . ($cname ? " @ $cname" : '')];
+                                         VALUES ('$sid', '$sname', '$semail', '$spass', $cid_val)
+                                         ON DUPLICATE KEY UPDATE
+                                         supervisor_name='$sname', supervisor_email='$semail',
+                                         supervisor_password='$spass', company_id=$cid_val")) {
+                    $label = $sname . ($cname ? " @ $cname" : '');
+                    if (!$supExists) {
+                        $csvLog[] = ['row' => $rowNum, 'id' => $sid, 'status' => 'ok', 'msg' => "Added: $label"];
+                    }
                     $added++;
                 } else {
                     $csvLog[] = ['row' => $rowNum, 'id' => $sid, 'status' => 'error', 'msg' => mysqli_error($conn)];
@@ -163,16 +170,30 @@ if (isset($_POST['action']) && $_POST['action'] === 'csv_sup') {
     }
 }
 
-// Delete lecturer or supervisor
+// Delete lecturer or supervisor - redirect after GET to clear message state
 if (isset($_GET['del_lec'])) {
     $id = mysqli_real_escape_string($conn, $_GET['del_lec']);
     mysqli_query($conn, "DELETE FROM lecturer WHERE lecturer_id='$id'");
-    $msg = "Lecturer deleted.";
+    header("Location: users.php?del_ok=lec");
+    exit();
 }
 if (isset($_GET['del_sup'])) {
     $id = mysqli_real_escape_string($conn, $_GET['del_sup']);
     mysqli_query($conn, "DELETE FROM supervisor WHERE supervisor_id='$id'");
-    $msg = "Supervisor deleted.";
+    header("Location: users.php?del_ok=sup");
+    exit();
+}
+if (isset($_GET['del_ok'])) {
+    $msg = ($_GET['del_ok'] === 'lec') ? "Lecturer deleted." : "Supervisor deleted.";
+}
+$msgMap = [
+    'lec_updated' => "Lecturer updated.",
+    'lec_added'   => "Lecturer added.",
+    'sup_updated' => "Supervisor updated.",
+    'sup_added'   => "Supervisor added.",
+];
+if (isset($_GET['msg']) && isset($msgMap[$_GET['msg']])) {
+    $msg = $msgMap[$_GET['msg']];
 }
 
 // Add or edit lecturer
@@ -187,7 +208,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_lec') {
     } else {
         mysqli_query($conn, "INSERT INTO lecturer (lecturer_id, lecturer_name, lecturer_email, lecturer_password)
                               VALUES ('$lid', '$lname', '$lemail', '$lpass')");
-        $msg = "Lecturer added.";
+        header("Location: users.php?msg=lec_added#lec-form");
+        exit();
     }
 }
 if (isset($_POST['action']) && $_POST['action'] == 'edit_lec') {
@@ -197,7 +219,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'edit_lec') {
     $lpass  = mysqli_real_escape_string($conn, trim($_POST['lecturer_password']));
     mysqli_query($conn, "UPDATE lecturer SET lecturer_name='$lname', lecturer_email='$lemail',
                           lecturer_password='$lpass' WHERE lecturer_id='$lid'");
-    $msg = "Lecturer updated.";
+    header("Location: users.php?msg=lec_updated#lec-form");
+    exit();
 }
 
 // Add or edit supervisor
@@ -214,7 +237,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_sup') {
         $scid_val = $scid ? "'$scid'" : 'NULL';
         mysqli_query($conn, "INSERT INTO supervisor (supervisor_id, supervisor_name, supervisor_email, supervisor_password, company_id)
                               VALUES ('$sid', '$sname', '$semail', '$spass', $scid_val)");
-        $msg = "Supervisor added.";
+        header("Location: users.php?msg=sup_added&msg_tab=sup#sup-form");
+        exit();
     }
 }
 if (isset($_POST['action']) && $_POST['action'] == 'edit_sup') {
@@ -226,7 +250,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'edit_sup') {
     $scid2_val = $scid2 ? "'$scid2'" : 'NULL';
     mysqli_query($conn, "UPDATE supervisor SET supervisor_name='$sname', supervisor_email='$semail',
                           supervisor_password='$spass', company_id=$scid2_val WHERE supervisor_id='$sid'");
-    $msg = "Supervisor updated.";
+    header("Location: users.php?msg=sup_updated&msg_tab=sup#sup-form");
+    exit();
 }
 
 // Calculate the next auto-suggested ID for each user type
@@ -291,6 +316,8 @@ if (isset($_GET['edit_sup'])) {
             <td>
                 <?php if ($log['status'] === 'ok'): ?>
                     <span class="badge badge-pass">✅ Added</span>
+                <?php elseif ($log['status'] === 'updated'): ?>
+                    <span class="badge badge-pending">🔄 Updated</span>
                 <?php elseif ($log['status'] === 'skipped'): ?>
                     <span class="badge badge-pending">⏭ Skipped</span>
                 <?php else: ?>
@@ -338,7 +365,7 @@ if (isset($_GET['edit_sup'])) {
 </div>
 
 <!-- Add / edit single lecturer -->
-<div class="card">
+<div class="card" id="lec-form">
     <div class="card-title"><?= $editLec ? '✏️ Edit Lecturer' : '➕ Add Single Lecturer' ?></div>
     <form method="POST">
         <input type="hidden" name="action" value="<?= $editLec ? 'edit_lec' : 'add_lec' ?>">
@@ -439,7 +466,7 @@ if (isset($_GET['edit_sup'])) {
 </div>
 
 <!-- Add / edit single supervisor -->
-<div class="card">
+<div class="card" id="sup-form">
     <div class="card-title"><?= $editSup ? '✏️ Edit Supervisor' : '➕ Add Single Supervisor' ?></div>
     <form method="POST">
         <input type="hidden" name="action" value="<?= $editSup ? 'edit_sup' : 'add_sup' ?>">
@@ -545,7 +572,10 @@ function switchTab(name, btn) {
 // Auto-open the correct tab based on URL params
 (function () {
     const p = new URLSearchParams(window.location.search);
-    if (p.has('edit_sup') || p.has('del_sup')) {
+    // Switch to supervisor tab when editing, deleting, or after supervisor delete redirect
+    if (p.has('edit_sup') || p.has('del_sup') ||
+        (p.has('del_ok') && p.get('del_ok') === 'sup') ||
+        (p.has('msg_tab') && p.get('msg_tab') === 'sup')) {
         switchTab('supervisors', document.querySelectorAll('.tab-btn')[1]);
     }
 })();
