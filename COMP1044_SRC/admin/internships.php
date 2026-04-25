@@ -63,6 +63,25 @@ if (isset($_POST['action']) && $_POST['action'] == 'edit') {
     $msg = "Internship record updated.";
 }
 
+// DELETE COMPANY
+if (isset($_GET['del_company'])) {
+    $cid = (int) $_GET['del_company'];
+    mysqli_query($conn, "DELETE FROM company WHERE company_id=$cid");
+    // Reset AUTO_INCREMENT so IDs don't keep growing after deletes
+    mysqli_query($conn, "ALTER TABLE company AUTO_INCREMENT = 1");
+    $msg = "Company deleted. Linked supervisors and internships have had their company reference cleared.";
+}
+
+// EDIT COMPANY (POST)
+if (isset($_POST['action']) && $_POST['action'] === 'edit_company') {
+    $cid   = (int) $_POST['company_id'];
+    $cname = mysqli_real_escape_string($conn, trim($_POST['company_name']));
+    if ($cname) {
+        mysqli_query($conn, "UPDATE company SET company_name='$cname' WHERE company_id=$cid");
+        $msg = "Company updated.";
+    }
+}
+
 // ADD COMPANY
 if (isset($_POST['action']) && $_POST['action'] == 'add_company') {
     $cname = mysqli_real_escape_string($conn, trim($_POST['company_name']));
@@ -96,9 +115,11 @@ if (isset($_POST['action']) && $_POST['action'] === 'csv_company') {
                     continue;
                 $chk = mysqli_query($conn, "SELECT company_id FROM company WHERE company_name='$cname'");
                 if (mysqli_num_rows($chk) > 0) {
+                    mysqli_free_result($chk);
                     $skipped++;
                     continue;
                 }
+                mysqli_free_result($chk);
                 mysqli_query($conn, "INSERT INTO company (company_name) VALUES ('$cname')");
                 $csvLog[] = $cname;
                 $added++;
@@ -154,6 +175,14 @@ if (isset($_GET['edit'])) {
     $editRow = mysqli_fetch_assoc($res);
 }
 
+// Company edit mode
+$editCompany = null;
+if (isset($_GET['edit_company'])) {
+    $ecid = (int) $_GET['edit_company'];
+    $cres = mysqli_query($conn, "SELECT * FROM company WHERE company_id=$ecid");
+    $editCompany = mysqli_fetch_assoc($cres);
+}
+
 // Helpers for pre-filling edit mode text fields
 function getLecturerLabel($lecturers, $id)
 {
@@ -195,7 +224,7 @@ function getCompanyLabel($companies, $id)
     <?php endif; ?>
 
     <!-- Company Management -->
-    <div class="card">
+    <div class="card" data-section="company-form">
         <div class="card-title flex-between">
             <span>📤 Bulk Upload via CSV</span>
             <a href="internships.php?template=company" class="btn btn-outline btn-sm">⬇️ Download Template</a>
@@ -221,18 +250,98 @@ function getCompanyLabel($companies, $id)
 
         <hr style="margin:16px 0;">
 
-        <!-- Single Add -->
-        <p
-            style="font-size:12.5px;font-weight:700;color:var(--text-secondary);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px;">
-            ➕ Add Single Company</p>
+        <!-- Single Add / Edit -->
+        <p style="font-size:12.5px;font-weight:700;color:var(--text-secondary);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px;">
+            <?= $editCompany ? '✏️ Edit Company' : '➕ Add Single Company' ?></p>
         <form method="POST" style="display:flex; gap:10px; align-items:flex-end;">
-            <input type="hidden" name="action" value="add_company">
+            <input type="hidden" name="action" value="<?= $editCompany ? 'edit_company' : 'add_company' ?>">
+            <?php if ($editCompany): ?>
+                <input type="hidden" name="company_id" value="<?= $editCompany['company_id'] ?>">
+            <?php endif; ?>
             <div class="form-group mb-0" style="flex:1">
                 <label>Company Name</label>
-                <input type="text" name="company_name" placeholder="e.g. Petronas Berhad" required>
+                <input type="text" name="company_name"
+                       value="<?= htmlspecialchars($editCompany['company_name'] ?? '') ?>"
+                       placeholder="e.g. Petronas Berhad" required>
             </div>
-            <button type="submit" class="btn btn-success">➕ Add</button>
+            <button type="submit" class="btn <?= $editCompany ? 'btn-primary' : 'btn-success' ?>">
+                <?= $editCompany ? '💾 Update' : '➕ Add' ?>
+            </button>
+            <?php if ($editCompany): ?>
+                <a href="internships.php" class="btn btn-outline">Cancel</a>
+            <?php endif; ?>
         </form>
+    </div>
+
+    <!-- Company List Table -->
+    <div class="card">
+        <div class="card-title flex-between">
+            <span>🏢 Company List</span>
+            <div class="search-bar">
+                <input type="text" id="companySearchInput" placeholder="Search companies...">
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table id="companyTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Company Name</th>
+                        <th>Supervisors</th>
+                        <th>Internships</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $cListRes = mysqli_query($conn,
+                        "SELECT c.company_id, c.company_name,
+                                COUNT(DISTINCT sv.supervisor_id) AS sup_count,
+                                COUNT(DISTINCT i.internship_id)  AS int_count
+                         FROM company c
+                         LEFT JOIN supervisor sv ON sv.company_id = c.company_id
+                         LEFT JOIN internship  i  ON i.company_id  = c.company_id
+                         GROUP BY c.company_id, c.company_name
+                         ORDER BY c.company_id");
+                    while ($crow = mysqli_fetch_assoc($cListRes)):
+                    ?>
+                    <tr>
+                        <td><?= $crow['company_id'] ?></td>
+                        <td><?= htmlspecialchars($crow['company_name']) ?></td>
+                        <td>
+                            <?php if ($crow['sup_count'] > 0): ?>
+                                <span class="badge badge-pass"><?= $crow['sup_count'] ?></span>
+                            <?php else: ?>
+                                <span class="text-muted">0</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($crow['int_count'] > 0): ?>
+                                <span class="badge badge-pass"><?= $crow['int_count'] ?></span>
+                            <?php else: ?>
+                                <span class="text-muted">0</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <a href="internships.php?edit_company=<?= $crow['company_id'] ?>"
+                               class="btn btn-warning btn-sm">✏️ Edit</a>
+                            <?php
+                                $warnParts = [];
+                                if ($crow['sup_count'] > 0) $warnParts[] = $crow['sup_count'] . ' supervisor(s)';
+                                if ($crow['int_count'] > 0) $warnParts[] = $crow['int_count'] . ' internship(s)';
+                                $warnMsg = count($warnParts) > 0
+                                    ? "Delete '" . htmlspecialchars($crow['company_name'], ENT_QUOTES) . "'?\n\nWarning: This company is linked to " . implode(' and ', $warnParts) . ". Their company reference will be cleared (set to none)."
+                                    : "Delete company '" . htmlspecialchars($crow['company_name'], ENT_QUOTES) . "'?";
+                            ?>
+                            <a href="internships.php?del_company=<?= $crow['company_id'] ?>"
+                               class="btn btn-danger btn-sm confirm-delete"
+                               data-msg="<?= htmlspecialchars($warnMsg) ?>">🗑️ Delete</a>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Add / Edit Internship -->
@@ -534,7 +643,14 @@ function getCompanyLabel($companies, $id)
         if (supCont) supCont._setItems(preFiltered);
     }
 
-    // Form validation before submit
+// Company table live search
+document.getElementById('companySearchInput').addEventListener('input', function () {
+    var q = this.value.toLowerCase();
+    document.querySelectorAll('#companyTable tbody tr').forEach(function (tr) {
+        tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+});
+
     document.getElementById('internshipForm').addEventListener('submit', function (e) {
         var errors = [];
         var stuHidden = document.querySelector('#sd-student .sd-value');
@@ -548,6 +664,14 @@ function getCompanyLabel($companies, $id)
             alert('Please select from the dropdown list for:\n• ' + errors.join('\n• '));
         }
     });
+
+    // Auto-scroll to company form when editing a company
+    <?php if ($editCompany): ?>
+    document.addEventListener('DOMContentLoaded', function () {
+        var companyCard = document.querySelector('[data-section="company-form"]');
+        if (companyCard) companyCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    <?php endif; ?>
 </script>
 
 <?php include "footer.php"; ?>
