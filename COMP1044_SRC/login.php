@@ -52,6 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InternTrack — Sign In</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .login-remember { margin: -6px 0 12px; }
+    </style>
 </head>
 <body class="login-body"> <div class="login-card"> <div class="login-header">
         <div class="login-icon-wrap">🎓</div>
@@ -63,24 +66,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="login-error-box"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form method="POST" action="" autocomplete="off">
+    <form method="POST" action="" autocomplete="on" id="loginForm">
         <div class="login-field">
             <label>User ID</label>
-            <input type="text" name="user_id"
+            <input type="text" name="user_id" id="userIdInput"
                    placeholder="Enter your ID"
                    value="<?= htmlspecialchars($_POST['user_id'] ?? '') ?>"
-                   autocomplete="off" required>
+                   autocomplete="username" required>
         </div>
         
         <div class="login-field">
             <label>Password</label>
-            <input type="password" name="password"
+            <input type="password" name="password" id="passwordInput"
                    placeholder="Enter your password"
                    autocomplete="current-password" required>
+        </div>
+
+        <div class="login-remember">
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; cursor:pointer;">
+                <input type="checkbox" id="rememberMe" style="width:auto; margin:0;">
+                Remember my ID
+            </label>
         </div>
         
         <button type="submit" class="btn-login">Login</button>
     </form>
+
+    <script>
+    // Remember user ID via localStorage
+    const rememberBox = document.getElementById('rememberMe');
+    const userIdInput = document.getElementById('userIdInput');
+
+    // On page load: restore saved ID if present
+    const savedId = localStorage.getItem('irms_saved_uid');
+    if (savedId) {
+        userIdInput.value = savedId;
+        rememberBox.checked = true;
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function() {
+        if (rememberBox.checked) {
+            localStorage.setItem('irms_saved_uid', userIdInput.value);
+        } else {
+            localStorage.removeItem('irms_saved_uid');
+        }
+    });
+    </script>
 
 </div>
 
