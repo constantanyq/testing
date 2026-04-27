@@ -74,65 +74,6 @@ COMP1044_SRC/
 
 ---
 
-## 🗄️ Database Schema
-
-**Database:** `COMP1044_Database`
-
-| Table | Key Columns |
-|---|---|
-| `admin` | `admin_id`, `admin_name`, `admin_email`, `admin_password` |
-| `student` | `student_id`, `student_name`, `student_email`, `programme`, `student_password` |
-| `lecturer` | `lecturer_id`, `lecturer_name`, `lecturer_email`, `lecturer_password` |
-| `supervisor` | `supervisor_id`, `supervisor_name`, `supervisor_email`, `supervisor_password`, `company_name` |
-| `company` | `company_id`, `company_name` |
-| `internship` | `internship_id`, `student_id`, `lecturer_id`, `supervisor_id`, `company_id`, `duration`, `l_marks_id`, `s_marks_id`, `average_marks` |
-| `component` | `component_id`, `component_name`, `component_weightage` |
-| `lecturer_marks` | `l_marks_id`, `component_id`, `component_mark`, `total_marks`, `comments` |
-| `supervisor_marks` | `s_marks_id`, `component_id`, `component_mark`, `total_marks`, `comments` |
-
----
-
-## ⚙️ Setup & Installation
-
-### Requirements
-- PHP 8.x
-- MySQL 8.x
-- Apache/Nginx (e.g. via XAMPP, MAMP, or Laragon)
-
-### Steps
-
-1. **Clone or extract** the project into your web server's root directory (e.g. `htdocs/` or `www/`).
-
-2. **Import the database:**
-   - Open phpMyAdmin (or MySQL CLI)
-   - Create a database named `COMP1044_Database`
-   - Import `COMP1044_Database.sql`
-
-3. **Configure the database connection** in `connection.php`:
-   ```php
-   $host     = "localhost";
-   $user     = "root";
-   $password = "your_password";
-   $database = "COMP1044_Database";
-   ```
-
-4. **Visit** `http://localhost/COMP1044_SRC/` in your browser.
-
----
-
-## 🔐 Default Login Credentials
-
-| Role | ID | Password |
-|---|---|---|
-| Admin | `A001` | `admin123` |
-| Lecturer | `L001` | `pass123` |
-| Supervisor | `S001` | `pass123` |
-| Student | *(see database)* | `password123` |
-
-> ⚠️ **Security Notice:** Passwords are stored as plain text. This project is intended for academic/demo use only. Do **not** deploy to a public server without implementing proper password hashing (`password_hash` / `password_verify`) and prepared statements.
-
----
-
 ## 📋 CSV Bulk Import
 
 Admins can bulk-import records using CSV files. Download the provided templates from within the system:
@@ -144,22 +85,3 @@ Admins can bulk-import records using CSV files. Download the provided templates 
 | Supervisors | `supervisor_id`, `supervisor_name`, `supervisor_email`, `supervisor_password`, `company_name` |
 | Companies | `company_name` |
 
----
-
-## 🏫 Grade Scheme
-
-| Average Marks | Grade |
-|---|---|
-| ≥ 80 | 🌟 Distinction |
-| 50 – 79 | ✅ Pass |
-| < 50 | ❌ Fail |
-| Not yet graded | ⏳ Pending |
-
----
-
-## 🛠️ Tech Stack
-
-- **Backend:** PHP 8.x (procedural MySQLi)
-- **Database:** MySQL 8.x
-- **Frontend:** HTML5, CSS3, vanilla JavaScript
-- **Database tool:** phpMyAdmin
